@@ -1,19 +1,8 @@
 #include <Python.h>
 #include <string.h>
 #include <sys/types.h>
-void revstr(char *str)  
-{
-    int i;
-	int j;
-	unsigned char a;
-	unsigned len = strlen((const char *)str);
-	for (i = 0, j = len - 1; i < j; i++, j--)
-	{
-		a = str[i];
-		str[i] = str[j];
-		str[j] = a;
-	}
-}  
+#include <stdbool.h>
+#include "impfunctions.h"
 
 static PyObject* _strrev(PyObject* self, PyObject *args) {
    PyObject* name;
@@ -27,20 +16,34 @@ static PyObject* _strrev(PyObject* self, PyObject *args) {
    return PyUnicode_FromString(s);
 }
 
+static PyObject* _startswith(PyObject* self, PyObject *args) {
+    char* string;
+    char* substring;
+    char* s, sb;
+    int result;
+    if (!PyArg_ParseTuple(args, "ss", &string, &substring)) {
+        return NULL;
+    }
+    
+    result = startswith(string, substring);  
+    return PyLong_FromLong(result); 
+} 
 
 static struct PyMethodDef methods[] = {
-    {"strrev", (PyCFunction)_strrev, METH_VARARGS},
-    {NULL, NULL}
+    {"reverse", (PyCFunction)_strrev, METH_VARARGS},
+    {"startsWith", (PyCFunction)_startswith, METH_VARARGS},
+    {NULL, NULL, 0, NULL},
+    {NULL, NULL, 0, NULL}
 };
 
 static struct PyModuleDef module = {
     PyModuleDef_HEAD_INIT, 
-    "_strrev",
+    "str",
     NULL, 
     -1, 
     methods
 };
 
-PyMODINIT_FUNC PyInit__strrev(void) {
+PyMODINIT_FUNC PyInit_str(void) {
     return PyModule_Create(&module);
 }
